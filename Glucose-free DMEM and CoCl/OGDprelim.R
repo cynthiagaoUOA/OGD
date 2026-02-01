@@ -29,7 +29,7 @@ dmem_cocl1key <- tribble(
 
 dmem_cocl1labeled <- vascr:::vascr_apply_map(dmem_cocl1, dmem_cocl1key)
 
-dmem_cocl1plotdata <- ogd1labeled %>%
+dmem_cocl1plotdata <- dmem_cocl1labeled %>%
   vascr_subset(unit = "Rb") %>%
   vascr_zero_time(64.78) %>%
   vascr_resample_time(500) %>%
