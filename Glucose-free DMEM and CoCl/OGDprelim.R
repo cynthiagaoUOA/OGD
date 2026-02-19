@@ -39,14 +39,19 @@ dmem_cocl1plotdata <- dmem_cocl1labeled %>%
 dmem_cocl1plotdata  %>%  vascr_subset(sampleid = c(1:8)) %>% vascr_summarise(level = "experiment") %>%
   vascr_plot_line() 
 
+# all DMEM conditions
 dmem_cocl1plotdata  %>%  vascr_subset(sampleid = c(3,4,5, 6,7)) %>% vascr_summarise(level = "experiment") %>%
   vascr_plot_line() +ylim(-0.001,1.3) +xlim(-4,50)+
   geom_vline(xintercept=0, linetype="dashed", color="cornflowerblue")
 
-dmem_cocl1plotdata  %>%  vascr_subset(sampleid = c(1,2)) %>% vascr_summarise(level = "experiment") %>%
-  vascr_plot_line() +ylim(0,1.3)
 
-dmem_cocl1plotdata  %>%  vascr_subset(sampleid = c(5,6,7)) %>% vascr_summarise(level = "experiment") %>%
+#AIMV with Cocl2 vs vehicle
+dmem_cocl1plotdata  %>%  vascr_subset(sampleid = c(1,2)) %>% vascr_summarise(level = "experiment") %>%
+  vascr_plot_line() +ylim(0,1.5) +xlim(-4,40)  
+
+
+#glucosefree DMEM vhicle vs glucose vs glutamine
+dmem_cocl1plotdata  %>%  vascr_subset(sampleid = c(5,6)) %>% vascr_summarise(level = "experiment") %>%
   vascr_plot_line() 
 
 
