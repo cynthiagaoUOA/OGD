@@ -1,5 +1,9 @@
 # combined data
 
+library(tidyverse)
+library(vascr)
+library(ggplot2)
+
 paired1hypox <- vascr_import("ECIS",
                              raw = "Grafton paired 131 ogd/ECIS_260521_MFT_1_CG_ogdpaired1hypoxrestart.abp",
                              model = "Grafton paired 131 ogd/ECIS_260521_MFT_1_CG_ogdpaired1hypoxrestart_RbA.csv", experiment = "exp1"
@@ -85,3 +89,7 @@ combinedtworuns %>% vascr_subset(sampleid= c(2,4,3,1)) %>%  vascr_summarise(leve
 #normoxic
 combinedtworuns %>% vascr_subset(sampleid= c(12,14,13,11)) %>%  vascr_summarise(level="summary") %>%  
   vascr_plot_line() +facet_wrap(~Experiment)+ theme_bw()+ylim(0, 1.3)
+
+# with glucose
+combinedtworuns %>% vascr_subset(sampleid= c(1,4, 11, 12)) %>%  vascr_summarise(level="summary") %>%  
+  vascr_plot_line() +facet_wrap(~Experiment)+ theme_bw()
