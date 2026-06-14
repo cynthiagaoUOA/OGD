@@ -24,6 +24,7 @@ paired1hypoxkey <- tribble(
   6, "F", "1 2 3", "hypox DMEM",
   7, "G", "1 2 3", "hypox DMEM + 5mM glucose",
   8, "H", "1 2 3", "hypox DMEM + 2mM glutamax"
+  
   )
 
 
@@ -57,7 +58,7 @@ paired1normoxkey <- tribble(
 p1normox <- vascr:::vascr_apply_map(paired1normox, paired1normoxkey) 
 
 
-p1combined<- vascr_combine(p1hypox, p1normox) %>% 
+p1combined<- vascr_combine(p1hypox, p1normox) %>% drop_na() %>% 
   vascr_zero_time(15.62) %>% 
   vascr_resample_time(500) %>% 
   vascr_normalise(-2, divide = TRUE) %>% 
@@ -86,4 +87,7 @@ p1combined  %>%  vascr_subset(sampleid = c(26, 25, 27,28)) %>% vascr_exclude(wel
 p1combined  %>%  vascr_subset(sampleid = c(21:24)) %>% vascr_exclude(well ="H8") %>% vascr_summarise(level = "experiment") %>%
   vascr_plot_line() + theme_bw()
 
-#### how best to separate out hypox and normox? Have to combine all. Don't think I will need to facet
+#### how best to separate out hypox and normox? Have to combine all. Don't think I will need to facet. Don't have modeled data
+
+p1combined  %>%  vascr_subset(sampleid = c(111,1)) %>% vascr_summarise(level = "experiment") %>%
+  vascr_plot_line() + theme_bw()

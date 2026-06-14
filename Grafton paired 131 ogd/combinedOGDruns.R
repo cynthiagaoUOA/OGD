@@ -91,5 +91,5 @@ combinedtworuns %>% vascr_subset(sampleid= c(12,14,13,11)) %>%  vascr_summarise(
   vascr_plot_line() +facet_wrap(~Experiment)+ theme_bw()+ylim(0, 1.3)
 
 # with glucose
-combinedtworuns %>% vascr_subset(sampleid= c(1,4, 11, 12)) %>%  vascr_summarise(level="summary") %>%  
+combinedtworuns %>% vascr_subset(sampleid= c(1,2, 11, 12)) %>%  vascr_summarise(level="summary") %>%  
   vascr_plot_line() +facet_wrap(~Experiment)+ theme_bw()

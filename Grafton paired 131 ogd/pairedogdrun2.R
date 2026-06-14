@@ -71,13 +71,19 @@ paired2normoxkey <- tribble(
   
   113, "G", "4 5 6", "131 growth changed to EGM at treatment",
   
-  114, "F", "4 5 6", "EGM growth curve"
+  114, "E F", "4 5 6", "EGM growth curve",
+  
+  200, "G", "10 11 12", "Full with CoCl2", 
+  201, "H", "4 5 6", "neither CoCl2", 
+  202, "H", "7 8 9", "no glucose CoCl2", 
+  203, "H", "10 11 12", "no glutamax CoCl2"
+  
+  
 )
 
-p2norm <- vascr:::vascr_apply_map(paired2normox, paired2normoxkey) 
+p2norm <- vascr:::vascr_apply_map(paired2normox, paired2normoxkey) %>% drop_na()
 
-
-all<- vascr_combine(p1, p2) 
+paired<- vascr_combine(p2norm, p2hypox) 
 
 paired %>% vascr_zero_time(65.764) %>%  vascr_resample_time(500) %>%  vascr_normalise(-2, divide = TRUE) %>% 
   vascr_subset(unit= "Rb", time= c(-5, 48)) %>% 
@@ -89,3 +95,54 @@ paired %>% vascr_zero_time(65.764) %>%  vascr_resample_time(500) %>%  vascr_norm
   vascr_subset(unit= c("Cm", "alpha"), time= c(-5, 48)) %>% 
   vascr_subset(sampleid= c(1, 6, 7, 12, 101, 106, 107, 112)) %>% 
   vascr_summarise(level="experiment") %>%  vascr_plot_line()+ylim(0,1.5) + facet_wrap(~unit)
+
+## EGM and 131 comparison
+# Rb
+Rbmedias<- paired %>% vascr_zero_time(0) %>%  vascr_resample_time(500) %>%  
+  vascr_subset(unit= c("Rb"), time= c(0, 80)) %>% 
+  vascr_subset(sampleid= c(114, 101)) %>% 
+  vascr_summarise(level="experiment") %>%  vascr_plot_line()
+# R
+Rmedias<- paired %>% vascr_zero_time(0) %>%  vascr_resample_time(500) %>%  
+  vascr_subset(unit= "R", frequency="4000", time= c(0, 80)) %>% 
+  vascr_subset(sampleid= c(114, 101)) %>% 
+  vascr_summarise(level="experiment") %>%  vascr_plot_line()
+
+# Cm
+Cmmedias<- paired %>% vascr_zero_time(0) %>%  vascr_resample_time(500) %>%  
+  vascr_subset(unit= "Cm", time= c(1, 80)) %>% # starts really high, think artifact
+  vascr_subset(sampleid= c(114, 101)) %>% 
+  vascr_summarise(level="experiment") %>%  vascr_plot_line()
+# alpha
+alphamedias<- paired %>% vascr_zero_time(0) %>%  vascr_resample_time(500) %>%  
+  vascr_subset(unit= "alpha", time= c(1, 80)) %>% # starts really high, think artifact
+  vascr_subset(sampleid= c(114, 101)) %>% 
+  vascr_summarise(level="experiment") %>%  vascr_plot_line()
+
+library(patchwork)
+Rbmedias +Rmedias+ Cmmedias+alphamedias + plot_layout(guides = "collect") & geom_vline(xintercept=65)
+
+
+# barplot
+Rbmediasbar<- paired %>% vascr_resample_time(500) %>%  
+  vascr_subset(unit= c("Rb"), time= c(65)) %>% 
+  vascr_subset(sampleid= c(114, 101)) %>% group_by(Sample) %>% summarise(mean=mean(Value), sd= sd(Value)) 
+
+ggplot(data=Rbmediasbar, 
+       aes(
+         x= Sample, y=mean, fill = Sample))+
+  geom_bar(stat="identity")+ geom_errorbar(aes(ymin= mean-sd, ymax=mean+sd), width = 0.5)
+
+
+#### CoCl2
+p2norm %>% vascr_zero_time(65.764) %>%  vascr_resample_time(500) %>%  
+  vascr_normalise(-2, divide = TRUE) %>% 
+  vascr_subset(unit= "Rb", time= c(-4, 40)) %>% 
+  vascr_subset(sampleid= c(200:204)) %>% 
+  vascr_summarise(level="experiment") %>%  vascr_plot_line() +ylim(0, 1.25)
+
+p2norm %>% vascr_zero_time(65.764) %>%  vascr_resample_time(500) %>%  
+  vascr_normalise(-2, divide = TRUE) %>% 
+  vascr_subset(unit= "Rb", time= c(-4, 40)) %>% 
+  vascr_subset(sampleid= c(101, 106, 107, 112)) %>% 
+  vascr_summarise(level="experiment") %>%  vascr_plot_line() +ylim(0, 1.25)
