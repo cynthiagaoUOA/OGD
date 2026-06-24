@@ -120,7 +120,7 @@ alphamedias<- paired %>% vascr_zero_time(0) %>%  vascr_resample_time(500) %>%
   vascr_summarise(level="experiment") %>%  vascr_plot_line()
 
 library(patchwork)
-Rbmedias +Rmedias+ Cmmedias+alphamedias + plot_layout(guides = "collect") & geom_vline(xintercept=65)
+Rmedias + Rbmedias + Cmmedias+alphamedias + plot_layout(guides = "collect") & geom_vline(xintercept=65)
 
 
 # barplot

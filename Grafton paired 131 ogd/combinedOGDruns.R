@@ -151,10 +151,21 @@ p3<- vascr_combine(p3hypox, p3normox) %>% vascr_zero_time(87.145) %>%  vascr_res
 
 combinedthreeruns<- vascr_combine(p1,p2,p3) %>% drop_na %>% vascr_subset(unit="Rb") 
 
-hypox <- combinedthreeruns %>% vascr_subset(sampleid= c(1:4)) %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
+fullpaireddata<- combinedthreeruns %>% vascr_subset(sampleid=c(1:4, 11:14))
 
-normox<- combinedthreeruns %>% vascr_subset(sampleid= c(11:14))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
-  
+hypox <- combinedthreeruns %>% vascr_subset(sampleid= c(1:4)) %>% vascr_summarise(level="experiment") %>% vascr_plot_line() +theme_bw() 
+hypox
+
+# four conditions in normox
+normox<- combinedthreeruns %>% vascr_subset(sampleid= c(12, 14, 13, 11))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
+normox + ylim(0, 1.3)  
+
+# split normox by glucose/ no glucose
+combinedthreeruns %>% vascr_subset(sampleid= c(12, 14))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() + ylim(0, 1.3)  
+
+combinedthreeruns %>% vascr_subset(sampleid= c(13, 11))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() + ylim(0, 1.3)  
+
+
 normox + hypox & ylim(0,1.3)
 
 
@@ -184,8 +195,15 @@ rb3rawrb<- rb3rawrb %>% filter(Time== -1)
 
 ggplot(data= rb3rawrb, aes(x= Time, y= Value)) + 
  geom_boxplot() + 
-  geom_point(data=rb3rawrb, aes(x= Time, y=Value, colour= as.factor(exp)), position = "jitter")
+  geom_point(data=rb3rawrb, aes(x= , y=Value, colour= as.factor(exp)), position = "jitter") + ylim(0,5)
 
   
-  
+# numbers
+rb3rawrb %>% summarise(mean=mean(Value), median = median(Value))
+
+
+
+# Cross correlation -------------------------------------------------------
+
+fullpaireddata %>% vascr_subset(sampleid=c(14, 11, 13, 12)) %>% vascr:::vascr_plot_cc_stats(., unit = "Rb", frequency = 0, reference = "none", points = FALSE, stars = TRUE, pval = FALSE)
   
