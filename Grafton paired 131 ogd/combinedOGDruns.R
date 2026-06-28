@@ -153,8 +153,16 @@ combinedthreeruns<- vascr_combine(p1,p2,p3) %>% drop_na %>% vascr_subset(unit="R
 
 fullpaireddata<- combinedthreeruns %>% vascr_subset(sampleid=c(1:4, 11:14))
 
-hypox <- combinedthreeruns %>% vascr_subset(sampleid= c(1:4)) %>% vascr_summarise(level="experiment") %>% vascr_plot_line() +theme_bw() 
+hypox <- combinedthreeruns %>% vascr_subset(sampleid= c(2,4,3,1)) %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
 hypox
+
+
+# norm vs hypox full glucose
+combinedthreeruns %>%  vascr_subset(sampleid= c(1, 11)) %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
+
+
+
+
 
 # four conditions in normox
 normox<- combinedthreeruns %>% vascr_subset(sampleid= c(12, 14, 13, 11))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
@@ -163,9 +171,18 @@ normox + ylim(0, 1.3)
 # split normox by glucose/ no glucose
 combinedthreeruns %>% vascr_subset(sampleid= c(12, 14))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() + ylim(0, 1.3)  
 
-combinedthreeruns %>% vascr_subset(sampleid= c(13, 11))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() + ylim(0, 1.3)  
+combinedthreeruns %>% vascr_subset(sampleid= c(2,3,12,13))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() + ylim(0, 1.3)  
 
 
+# no glutamine
+combinedthreeruns %>%  vascr_subset(sampleid= c(1,2, 11,12))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() + ylim(0, 1.3)  
+
+combinedthreeruns %>%  vascr_subset(sampleid= c(11,12))  %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() + ylim(0, 1.3)  
+
+
+
+
+# all
 normox + hypox & ylim(0,1.3)
 
 
@@ -206,4 +223,11 @@ rb3rawrb %>% summarise(mean=mean(Value), median = median(Value))
 # Cross correlation -------------------------------------------------------
 
 fullpaireddata %>% vascr_subset(sampleid=c(14, 11, 13, 12)) %>% vascr:::vascr_plot_cc_stats(., unit = "Rb", frequency = 0, reference = "none", points = FALSE, stars = TRUE, pval = FALSE)
+
+
+norm <- fullpaireddata %>% vascr_subset(sampleid=c(14, 11, 13, 12))
+summary(aov(Value~Sample, data = norm))
+TukeyHSD(aov(Value~Sample, data = norm))
   
+
+check_cc<- fullpaireddata %>% vascr_subset(sampleid=c(14, 11, 13, 12)) %>% vascr:::vascr_summarise_cc(level="experiments")
