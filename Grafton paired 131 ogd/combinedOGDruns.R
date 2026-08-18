@@ -156,6 +156,11 @@ fullpaireddata<- combinedthreeruns %>% vascr_subset(sampleid=c(1:4, 11:14))
 hypox <- combinedthreeruns %>% vascr_subset(sampleid= c(2,4,3,1)) %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
 hypox
 
+hypox + xlim(-2, 20)
+
+
+
+
 
 # norm vs hypox full glucose
 combinedthreeruns %>%  vascr_subset(sampleid= c(1, 11)) %>% vascr_summarise(level="summary") %>% vascr_plot_line() +theme_bw() 
@@ -187,36 +192,60 @@ normox + hypox & ylim(0,1.3)
 
 
 
+# Cm, etc -----------------------------------------------------------------
+
+p1cm<- vascr_combine (p1normox, p1hypox)%>% vascr_zero_time(15.6) %>%  vascr_resample_time(500) %>%  vascr_normalise(-1, divide = TRUE) %>% 
+  vascr_subset(unit= "Cm", time= c(-5, 48)) 
+
+p2cm<- vascr_combine(p2normox, p2hypox) %>% vascr_zero_time(65.764) %>%  vascr_resample_time(500) %>%  vascr_normalise(-2, divide = TRUE) %>% 
+  vascr_subset(unit= "Cm", time= c(-5, 48)) 
+
+p3cm<- vascr_combine(p3hypox, p3normox) %>% vascr_zero_time(87.145) %>%  vascr_resample_time(500) %>%  vascr_normalise(-2, divide = TRUE) %>% 
+  vascr_subset(unit= "Cm", time= c(-5, 55), sampleid=c(1:14)) 
+
+
+
+combinedthreerunscm<- vascr_combine(p1cm,p2cm,p3cm) %>% drop_na %>% vascr_subset(unit="Cm") 
+
+fullpaireddatacm<- combinedthreerunscm %>% vascr_subset(sampleid=c(1:4, 11:14))
+
+
+fullpaireddatacm %>% vascr_subset(sampleid= c(1:4)) %>% vascr_summarise(level="sumary") %>% vascr_plot_line() +theme_bw() +xlim(-5, 15) +ylim(-0.5, 3)
+
+
+
+
+
 # Rb values ---------------------------------------------------------------
-
-p1raw<- vascr_combine (p1normox, p1hypox)%>% vascr_zero_time(15.6) %>%  vascr_resample_time(500) %>%  
-  vascr_subset(unit= "Rb", time= c(-5, 48))
-p1raw$exp<- c(1)
-
-p2raw<- vascr_combine(p2normox, p2hypox) %>% vascr_zero_time(65.764) %>%  vascr_resample_time(500) %>%  
-  vascr_subset(unit= "Rb", time= c(-5, 48))
-p2raw$exp<- c(2)
-
-p3raw<- vascr_combine(p3hypox, p3normox) %>% vascr_zero_time(87.145) %>%  vascr_resample_time(500) %>%  
-  vascr_subset(unit= "Rb", time= c(-5, 55), sampleid=c(1:14))
-p3raw$exp<- c(3)
-
-
-
-
-rb3rawrb<- rbind(p1raw,p2raw,p3raw) %>% drop_na() 
-
-rb3rawrb$Time <- round(rb3rawrb$Time) 
-
-rb3rawrb<- rb3rawrb %>% filter(Time== -1)
-
-ggplot(data= rb3rawrb, aes(x= Time, y= Value)) + 
- geom_boxplot() + 
-  geom_point(data=rb3rawrb, aes(x= , y=Value, colour= as.factor(exp)), position = "jitter") + ylim(0,5)
-
-  
-# numbers
-rb3rawrb %>% summarise(mean=mean(Value), median = median(Value))
+# 
+# p1raw<- vascr_combine (p1normox, p1hypox)%>% vascr_zero_time(15.6) %>%  vascr_resample_time(500) %>%  
+#   vascr_subset(unit= "Rb", time= c(-5, 48))
+# p1raw$exp<- c(1)
+# 
+# p2raw<- vascr_combine(p2normox, p2hypox) %>% vascr_zero_time(65.764) %>%  vascr_resample_time(500) %>%  
+#   vascr_subset(unit= "Rb", time= c(-5, 48))
+# p2raw$exp<- c(2)
+# 
+# p3raw<- vascr_combine(p3hypox, p3normox) %>% vascr_zero_time(87.145) %>%  vascr_resample_time(500) %>%  
+#   vascr_subset(unit= "Rb", time= c(-5, 55), sampleid=c(1:14))
+# p3raw$exp<- c(3)
+# 
+# 
+# 
+# 
+# rb3rawrb<- rbind(p1raw,p2raw,p3raw) %>% drop_na() 
+# 
+# rb3rawrb$Time <- round(rb3rawrb$Time) 
+# 
+# rb3rawrb<- rb3rawrb %>% filter(Time== -1)
+# 
+# ggplot(data= rb3rawrb, aes(x= Time, y= Value)) + 
+#  geom_boxplot() + 
+#   geom_point(data=rb3rawrb, aes(x= , y=Value, colour= as.factor(exp)), position = "jitter") + ylim(0,5)
+# 
+#   
+# # numbers
+# rb3rawrb %>% summarise(mean=mean(Value), median = median(Value))
 
 
 
@@ -231,3 +260,27 @@ TukeyHSD(aov(Value~Sample, data = norm))
   
 
 check_cc<- fullpaireddata %>% vascr_subset(sampleid=c(14, 11, 13, 12)) %>% vascr:::vascr_summarise_cc(level="experiments")
+
+
+
+# Modelling full data in lme4 not feasible or that useful ---------------------------------------------
+# 
+# # separate sample column into fuel, and oxygen. 
+# ogddata <- combinedthreeruns %>% vascr_subset(sampleid= c(1:4,11:14)) %>% 
+#   mutate(
+#     oxygen = if_else(str_starts(Sample, "hypox "), "hypox", "normox"),
+#     fuel = str_remove(Sample, "^hypox\\s+")
+#   )
+# 
+# library(lme4)
+# 
+# ogdmodel<- lmer(Value~ 1+ oxygen * fuel * Time + (Time|Experiment), data = ogddata) # fixed slopes, intercepts can vary between experiments (different starting points)
+# 
+# summary(ogdmodel)
+# 
+# 
+# qqnorm(residuals(ogdmodel))
+# plot(ogdmodel)
+# # bad fit, unsurprising, time is super nonlinear curve
+# 
+# # do anovas at chosen timepoints
